@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "MT58r0hh82Igj2em/QMUNPPW708=",
+			"path": "github.com/donovanhide/eventsource",
+			"revision": "3ed64d21fb0b6bd8b49bcfec08f3004daee8723d",
+			"revisionTime": "2017-10-31T11:33:27Z"
+		},
+		{
+			"checksumSHA1": "76D9RQiU+FVJCexfv/idRaNd2UQ=",
+			"path": "github.com/gambol99/go-marathon",
+			"revision": "ec4a50170df729be7380d2797177dea832f41013",
+			"revisionTime": "2017-09-22T09:33:20Z"
+		},
+		{
+			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"revisionTime": "2017-01-11T10:11:55Z"
+		}
+	],
+	"rootPath": "github.com/brainly/brick"
+}
