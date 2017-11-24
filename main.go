@@ -10,14 +10,10 @@ import (
 )
 
 func main() {
-	cfg := &config.Config{
-		Marathon:        "http://localhost:8080",
-		Scope:           "internal",
-		NginxConfig:     "services.conf",
-		NginxTemplate:   "services.tpl",
-		NginxCmd:        "nginx",
-		NginxReloadFunc: utils.NginxReload,
-	}
+	cfg, err := config.NewConfigFromFile("olowek.json")
+	panicOnError(err)
+
+	cfg.NginxReloadFunc = utils.NginxReload
 
 	client := setupMarathon(cfg.Marathon)
 
@@ -48,7 +44,9 @@ func connectToEventStream(client marathon.Marathon, trigger chan bool) {
 		log.Fatalf("Failed to register for events, %s", err)
 	}
 
-	log.Printf("Connected to Marathon event stream")
+	log.Printf("Force sync on start")
+	trigger <- true
+
 	for {
 
 		select {
