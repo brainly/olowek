@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 
 	"github.com/brainly/olowek/config"
@@ -9,8 +11,15 @@ import (
 	marathon "github.com/gambol99/go-marathon"
 )
 
+const (
+	DefaultConfigPath = "/etc/olowek/olowek.json"
+)
+
 func main() {
-	cfg, err := config.NewConfigFromFile("olowek.json")
+	cfgFlag := flag.String("c", DefaultConfigPath, fmt.Sprintf("Path to configuration file [default: %s]", DefaultConfigPath))
+	flag.Parse()
+
+	cfg, err := config.NewConfigFromFile(*cfgFlag)
 	panicOnError(err)
 
 	cfg.NginxReloadFunc = utils.NginxReload

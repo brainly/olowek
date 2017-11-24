@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"sync"
 )
 
@@ -33,16 +33,14 @@ type Config struct {
 }
 
 func NewConfigFromFile(path string) (*Config, error) {
-	file, err := ioutil.ReadFile(path)
+	var config Config
+
+	configFile, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
+	defer configFile.Close()
 
-	var cfg Config
-	err = json.Unmarshal(file, &cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
+	err = json.NewDecoder(configFile).Decode(&config)
+	return &config, err
 }
