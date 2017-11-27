@@ -15,11 +15,17 @@
 			"revisionTime": "2017-09-22T09:33:20Z"
 		},
 		{
+			"checksumSHA1": "lxkRdrwEUqQ+PJXuh/EdninmB3Y=",
+			"path": "github.com/go-test/deep",
+			"revision": "9898238679c264cfb10411539f14a0553dc8b295",
+			"revisionTime": "2017-10-27T21:44:15Z"
+		},
+		{
 			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
 			"path": "github.com/google/go-querystring/query",
 			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
 			"revisionTime": "2017-01-11T10:11:55Z"
 		}
 	],
-	"rootPath": "github.com/brainly/brick"
+	"rootPath": "github.com/brainly/olowek"
 }

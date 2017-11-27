@@ -1,0 +1,6 @@
+{
+  "scope": "internal",
+  "nginx_config": "services.conf",
+  "nginx_template": "services.tpl",
+  "nginx_cmd": "/usr/sbin/nginx"
+}

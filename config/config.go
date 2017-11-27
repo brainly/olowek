@@ -2,24 +2,19 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"sync"
+
+	"github.com/brainly/olowek/marathon"
 )
 
-type App struct {
-	Name   string
-	ID     string
-	Labels map[string]string
-	Env    map[string]string
-	Tasks  []AppTask
-}
-
-type AppTask struct {
-	ID           string
-	Host         string
-	Ports        []int
-	ServicePorts []int
-}
+var (
+	ErrMissingMarathon      = errors.New("Missing 'marathon' filed in configuration")
+	ErrMissingNginxConfig   = errors.New("Missing 'nginx_config' filed in configuration")
+	ErrMissingNginxTemplate = errors.New("Missing 'nginx_template' filed in configuration")
+	ErrMissingNginxCmd      = errors.New("Missing 'nginx_cmd' filed in configuration")
+)
 
 type Config struct {
 	sync.RWMutex
@@ -29,7 +24,7 @@ type Config struct {
 	NginxTemplate   string `json:"nginx_template"`
 	NginxCmd        string `json:"nginx_cmd"`
 	NginxReloadFunc func(string) error
-	Apps            []App
+	Apps            []marathon.Application
 }
 
 func NewConfigFromFile(path string) (*Config, error) {
@@ -42,5 +37,25 @@ func NewConfigFromFile(path string) (*Config, error) {
 	defer configFile.Close()
 
 	err = json.NewDecoder(configFile).Decode(&config)
-	return &config, err
+	if err != nil {
+		return nil, err
+	}
+
+	if config.Marathon == "" {
+		return nil, ErrMissingMarathon
+	}
+
+	if config.NginxConfig == "" {
+		return nil, ErrMissingNginxConfig
+	}
+
+	if config.NginxTemplate == "" {
+		return nil, ErrMissingNginxTemplate
+	}
+
+	if config.NginxCmd == "" {
+		return nil, ErrMissingNginxCmd
+	}
+
+	return &config, nil
 }

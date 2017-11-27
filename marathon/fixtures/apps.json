@@ -1,0 +1,79 @@
+{
+  "apps": [
+    {
+      "id": "/production/foo",
+      "env": {
+        "SERVICE_ENVIRONMENT": "production"
+      },
+      "labels": {
+        "scope": "public"
+      },
+      "tasks": [
+        {
+          "id": "production_foo.task1",
+          "host": "127.0.0.1",
+          "ports": [5411],
+          "healthCheckResults": [
+            {
+              "alive": true
+            }
+          ]
+        },
+        {
+          "id": "production_foo.task2",
+          "host": "127.0.0.2",
+          "ports": [5411],
+          "healthCheckResults": [
+            {
+              "alive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "/bar",
+      "env": {},
+      "labels": {
+        "scope": "internal"
+      },
+      "tasks": [
+        {
+          "id": "bar.task1",
+          "ports": [5412],
+          "healthCheckResults": [
+            {
+              "alive": true
+            }
+          ]
+        },
+        {
+          "id": "bar.task2",
+          "host": "127.0.0.2",
+          "ports": [],
+          "healthCheckResults": [
+            {
+              "alive": true
+            }
+          ]
+        },
+        {
+          "id": "bar.task3",
+          "host": "127.0.0.3",
+          "ports": [5413],
+          "healthCheckResults": [
+            {
+              "alive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "/foo/bar/baz",
+      "env": {},
+      "labels": {},
+      "tasks": []
+    }
+  ]
+}

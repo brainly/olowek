@@ -1,0 +1,6 @@
+{
+  "marathon": "http://127.0.0.1:8080,127.0.0.1:8080",
+  "nginx_config": "services.conf",
+  "nginx_template": "services.tpl",
+  "nginx_cmd": "/usr/sbin/nginx"
+}
