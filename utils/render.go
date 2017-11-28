@@ -13,10 +13,10 @@ func RenderTemplate(src, dest string, data interface{}) error {
 	srcName := filepath.Base(src)
 	tpl, err := template.New(srcName).
 		Funcs(template.FuncMap{
-			"split":   strings.Split,
-			"join":    strings.Join,
-			"trim":    strings.Trim,
-			"replace": strings.Replace,
+			"split":        split,
+			"join":         join,
+			"trim":         trim,
+			"keyOrDefault": keyOrDefault,
 		}).ParseFiles(src)
 
 	if err != nil {
@@ -41,4 +41,25 @@ func RenderTemplate(src, dest string, data interface{}) error {
 	}
 
 	return nil
+}
+
+func keyOrDefault(needle string, fallback string, haystack map[string]string) string {
+	if value, ok := haystack[needle]; ok {
+		return value
+	}
+
+	return fallback
+}
+
+// Revert arguments so this could be used in pipeline ex. "foo,bar" | split "," | join " "
+func split(sep, s string) []string {
+	return strings.Split(s, sep)
+}
+
+func join(sep string, a []string) string {
+	return strings.Join(a, sep)
+}
+
+func trim(cutset string, s string) string {
+	return strings.Trim(s, cutset)
 }
