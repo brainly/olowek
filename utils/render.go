@@ -25,6 +25,9 @@ func RenderTemplate(src, dest string, data interface{}) error {
 
 	parentDir := filepath.Dir(dest)
 	tmpFile, err := ioutil.TempFile(parentDir, fmt.Sprint(".%s.tmp-", srcName))
+	if err != nil {
+		return err
+	}
 	defer tmpFile.Close()
 
 	err = tpl.Execute(tmpFile, data)
