@@ -2,38 +2,38 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"sync"
+
+	"github.com/brainly/olowek/marathon"
 )
 
-type App struct {
-	Name   string
-	ID     string
-	Labels map[string]string
-	Env    map[string]string
-	Tasks  []AppTask
-}
-
-type AppTask struct {
-	ID           string
-	Host         string
-	Ports        []int
-	ServicePorts []int
-}
+const (
+	DefaultNginxConfig   = "/etc/nginx/conf.d/services.conf"
+	DefaultNginxTemplate = "/etc/olowek/services.tpl"
+	DefaultNginxCmd      = "/usr/sbin/nginx"
+	EmptyScope           = ""
+)
 
 type Config struct {
 	sync.RWMutex
-	Scope           string `json:"scope"`
+	Scope           string `json:"scope,omitempty"`
 	Marathon        string `json:"marathon"`
-	NginxConfig     string `json:"nginx_config"`
-	NginxTemplate   string `json:"nginx_template"`
-	NginxCmd        string `json:"nginx_cmd"`
+	NginxConfig     string `json:"nginx_config,omitempty"`
+	NginxTemplate   string `json:"nginx_template,omitempty"`
+	NginxCmd        string `json:"nginx_cmd,omitempty"`
 	NginxReloadFunc func(string) error
-	Apps            []App
+	Apps            []marathon.Application
 }
 
 func NewConfigFromFile(path string) (*Config, error) {
-	var config Config
+	config := Config{
+		Scope:         EmptyScope,
+		NginxConfig:   DefaultNginxConfig,
+		NginxTemplate: DefaultNginxTemplate,
+		NginxCmd:      DefaultNginxCmd,
+	}
 
 	configFile, err := os.Open(path)
 	if err != nil {
@@ -42,5 +42,13 @@ func NewConfigFromFile(path string) (*Config, error) {
 	defer configFile.Close()
 
 	err = json.NewDecoder(configFile).Decode(&config)
-	return &config, err
+	if err != nil {
+		return nil, err
+	}
+
+	if config.Marathon == "" {
+		return nil, fmt.Errorf("Missing 'marathon' field in '%s'", path)
+	}
+
+	return &config, nil
 }

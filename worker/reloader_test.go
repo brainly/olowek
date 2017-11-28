@@ -1,141 +1,81 @@
 package worker
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"testing"
 
-	marathon "github.com/gambol99/go-marathon"
+	"github.com/brainly/olowek/config"
+	"github.com/brainly/olowek/marathon"
+	"github.com/brainly/olowek/utils"
 )
 
-func TestIsTaskHealthy(t *testing.T) {
-	isTaskHealthyCases := map[string]struct {
-		task   marathon.Task
-		result bool
-	}{
-		"Missing ports should be unhealthy": {
-			task: marathon.Task{
-				Host:  "10.0.0.1",
-				Ports: []int{},
-			},
-			result: false,
-		},
-		"Missing host should be unhealthy": {
-			task: marathon.Task{
-				Ports: []int{5411},
-			},
-			result: false,
-		},
-		"Missing healthchecks should be healthy": {
-			task: marathon.Task{
-				Host:               "10.0.0.1",
-				Ports:              []int{5411},
-				HealthCheckResults: nil,
-			},
-			result: true,
-		},
-		"All healthchecks alive should be healthy": {
-			task: marathon.Task{
-				Host:  "10.0.0.1",
-				Ports: []int{5411},
-				HealthCheckResults: []*marathon.HealthCheckResult{
-					{
-						Alive: true,
-					},
-					{
-						Alive: true,
-					},
-				},
-			},
-			result: true,
-		},
-		"One failed health check should be unhealthy": {
-			task: marathon.Task{
-				Host:  "10.0.0.1",
-				Ports: []int{5411},
-				HealthCheckResults: []*marathon.HealthCheckResult{
-					{
-						Alive: true,
-					},
-					{
-						Alive: false,
-					},
-				},
-			},
-			result: false,
-		},
+func TestNginxReloaderWorker(t *testing.T) {
+	c, server := newFakeMarathonClient(t, "./fixtures/marathon.json")
+	defer server.Close()
+
+	tmpFile, err := ioutil.TempFile(".", ".services-test-")
+	if err != nil {
+		t.Fatalf("Unexpected error creating tmpfile: '%s'", err)
+	}
+	defer func() {
+		if err := tmpFile.Close(); err != nil {
+			t.Fatalf("Error closing tmpfile: '%s'", err)
+		}
+
+		os.Remove(tmpFile.Name())
+	}()
+
+	cfg := &config.Config{
+		Marathon:        server.URL,
+		NginxConfig:     tmpFile.Name(),
+		NginxTemplate:   "./fixtures/services.tpl",
+		NginxCmd:        "/bin/true",
+		NginxReloadFunc: utils.NginxReload,
 	}
 
-	for name, tt := range isTaskHealthyCases {
-		t.Run(name, func(t *testing.T) {
-			result := isTaskHealthy(tt.task)
+	reloader := NewNginxReloaderWorker(c, cfg)
+	reloader()
 
-			if tt.result != result {
-				t.Fatalf("Unexpected result: expected '%v', got '%v'", tt.result, result)
-			}
-		})
+	renderedTemplate, err := ioutil.ReadFile(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("Unexpected error reading tmpfile: '%s'", err)
+	}
+	expectedConf, err := ioutil.ReadFile("./fixtures/services.conf")
+	if err != nil {
+		t.Fatalf("Unexpected error reading services.conf: '%s'", err)
+	}
+
+	if string(expectedConf) != string(renderedTemplate) {
+		t.Fatalf("Rendered template is not as expected. Got:\n %s", string(renderedTemplate))
 	}
 }
 
-func TestIsInScope(t *testing.T) {
-	inScopeCases := map[string]struct {
-		app    marathon.Application
-		scope  string
-		result bool
-	}{
-		"Empty scope should pass": {
-			app:    marathon.Application{},
-			scope:  "",
-			result: true,
-		},
-		"Empty lables should filter out": {
-			app:    marathon.Application{},
-			scope:  "public",
-			result: false,
-		},
-		"No scope labe should filter out": {
-			app: marathon.Application{
-				Labels: &map[string]string{
-					"foo": "bar",
-				},
-			},
-			scope:  "public",
-			result: false,
-		},
-		"Different scope should filter out": {
-			app: marathon.Application{
-				Labels: &map[string]string{
-					"scope": "internal",
-				},
-			},
-			scope:  "public",
-			result: false,
-		},
-		"Matching scope should pass (1)": {
-			app: marathon.Application{
-				Labels: &map[string]string{
-					"scope": "public",
-				},
-			},
-			scope:  "public",
-			result: true,
-		},
-		"Matching scope should pass (2)": {
-			app: marathon.Application{
-				Labels: &map[string]string{
-					"scope": "internal",
-				},
-			},
-			scope:  "internal",
-			result: true,
-		},
+func newFakeMarathonClient(t *testing.T, file string) (marathon.Marathon, *httptest.Server) {
+	buf, err := ioutil.ReadFile(file)
+	if err != nil {
+		t.Fatalf("Error reading fixture file: '%s'", err)
 	}
 
-	for name, tt := range inScopeCases {
-		t.Run(name, func(t *testing.T) {
-			result := isInScope(tt.app, tt.scope)
+	server := newFakeMarathonAppsServer(string(buf))
 
-			if tt.result != result {
-				t.Fatalf("Unexpected result: expected '%v', got '%v'", tt.result, result)
-			}
-		})
+	c, err := marathon.NewMarathonClient(server.URL)
+	if err != nil {
+		t.Fatalf("Unexpected error: '%s'", err)
 	}
+
+	return c, server
+}
+
+func newFakeMarathonAppsServer(response string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.URL.Path == "/v2/apps" {
+			fmt.Fprintln(w, response)
+		}
+	}))
 }
