@@ -43,6 +43,17 @@ func TestNewConfigFromFile(t *testing.T) {
 			shouldFail: true,
 			config:     nil,
 		},
+		"Can specify only marathon field, other should be set to default values": {
+			fixture:    "./fixtures/only_marathon.json",
+			shouldFail: false,
+			config: &Config{
+				Scope:         EmptyScope,
+				NginxConfig:   DefaultNginxConfig,
+				NginxTemplate: DefaultNginxTemplate,
+				NginxCmd:      DefaultNginxCmd,
+				Marathon:      "http://marathon:8080",
+			},
+		},
 	}
 	for name, tt := range configCases {
 		t.Run(name, func(t *testing.T) {
