@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/brainly/olowek/config"
@@ -15,12 +16,24 @@ const (
 	DefaultConfigPath = "/etc/olowek/olowek.json"
 )
 
+var (
+	VERSION = "master"
+)
+
 var opts struct {
-	Config string `short:"c" long:"config" description:"Path to configuration file." default:"/etc/olowek/olowek.json"`
-	Debug  bool   `short:"d" long:"debug" description:"Enable debug logging"`
+	Config  string `short:"c" long:"config" description:"Path to configuration file." default:"/etc/olowek/olowek.json"`
+	Debug   bool   `short:"d" long:"debug" description:"Enable debug logging"`
+	Version func() `short:"v" long:"version" description:"Print version and exit"`
+}
+
+func versionFunc() {
+	fmt.Printf("olowek\nVersion: %s\n", VERSION)
+	os.Exit(0)
 }
 
 func main() {
+	opts.Version = versionFunc
+
 	if _, err := flags.Parse(&opts); err != nil {
 		os.Exit(1)
 	}
