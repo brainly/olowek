@@ -1,11 +1,11 @@
 package marathon
 
 import (
-	"log"
 	"net/url"
 	"path"
 
 	api "github.com/gambol99/go-marathon"
+	log "github.com/sirupsen/logrus"
 )
 
 type Application struct {
@@ -86,10 +86,10 @@ func (c *client) ConnectToEventStream(callback chan bool) {
 	// Register for events
 	events, err := c.client.AddEventsListener(api.EventIDApplications)
 	if err != nil {
-		log.Fatalf("Failed to register for events, %s", err)
+		log.WithFields(log.Fields{"err": err}).Fatal("Failed to register for events")
 	}
 
-	log.Printf("Force sync on start")
+	log.Info("Doing full sync on start")
 	callback <- true
 
 	for {
@@ -98,9 +98,11 @@ func (c *client) ConnectToEventStream(callback chan bool) {
 		case event := <-events:
 			select {
 			case callback <- true:
-				log.Printf("Call calback due to event: %#v", event.Event)
+				log.WithFields(log.Fields{
+					"event": event,
+				}).Debug("Received event. Pushing information to callback channel")
 			default:
-				log.Printf("Callback queue is full")
+				log.Debug("Callback queue is full")
 			}
 		}
 	}
