@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/brainly/olowek/config"
 	"github.com/brainly/olowek/marathon"
-	"github.com/brainly/olowek/utils"
 )
 
 func TestNginxReloaderWorker(t *testing.T) {
@@ -29,12 +29,16 @@ func TestNginxReloaderWorker(t *testing.T) {
 		os.Remove(tmpFile.Name())
 	}()
 
+	reloadFuncCalledTimes := 0
 	cfg := &config.Config{
-		Marathon:        server.URL,
-		NginxConfig:     tmpFile.Name(),
-		NginxTemplate:   "./fixtures/services.tpl",
-		NginxCmd:        "/bin/true",
-		NginxReloadFunc: utils.NginxReload,
+		Marathon:      server.URL,
+		NginxConfig:   tmpFile.Name(),
+		NginxTemplate: "./fixtures/services.tpl",
+		NginxCmd:      "/bin/true",
+		NginxReloadFunc: func(cmd string) error {
+			reloadFuncCalledTimes += 1
+			return nil
+		},
 	}
 
 	reloader := NewNginxReloaderWorker(c, cfg)
@@ -52,6 +56,31 @@ func TestNginxReloaderWorker(t *testing.T) {
 	if string(expectedConf) != string(renderedTemplate) {
 		t.Fatalf("Rendered template is not as expected. Got:\n %s", string(renderedTemplate))
 	}
+
+	stat, err := os.Stat(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("Unexpected error while getting stat for tmpfile: '%s'", err)
+	}
+	modtime := stat.ModTime()
+
+	// Sleep for 1s and try doing another worker call
+	time.Sleep(time.Second)
+	reloader()
+
+	stat, err = os.Stat(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("Unexpected error while getting stat for tmpfile: '%s'", err)
+	}
+	modtime_second_reload := stat.ModTime()
+
+	if modtime != modtime_second_reload {
+		t.Fatalf("File should not be modified since no configuration changes were made")
+	}
+
+	if reloadFuncCalledTimes != 1 {
+		t.Fatalf("Reload func should be called only once since no configuration changes were made")
+	}
+
 }
 
 func newFakeMarathonClient(t *testing.T, file string) (marathon.Marathon, *httptest.Server) {
