@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - 1.9
+
+script: make test
+
+notifications:
+  email: false
