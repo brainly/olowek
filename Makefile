@@ -16,6 +16,7 @@ build-deps: deps test
 deps:
 	@which govendor > /dev/null || \
 	(go get -u github.com/kardianos/govendor)
+	govendor sync -v
 
 clean:
 	@rm -rf bin

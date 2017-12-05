@@ -40,24 +40,21 @@
 		},
 		{
 			"checksumSHA1": "X1NTlfcau2XcV6WtAHF6b/DECOA=",
-			"origin": "github.com/sirupsen/logrus/vendor/golang.org/x/crypto/ssh/terminal",
 			"path": "golang.org/x/crypto/ssh/terminal",
-			"revision": "95cd2b9c79aa5e72ab0bc69b7ccc2be15bf850f6",
-			"revisionTime": "2017-11-18T12:42:23Z"
+			"revision": "94eea52f7b742c7cbe0b03b22f0c4c8631ece122",
+			"revisionTime": "2017-11-28T01:43:40Z"
 		},
 		{
 			"checksumSHA1": "SIhhNXud9FKua0s3WlGPRRkDKRg=",
-			"origin": "github.com/sirupsen/logrus/vendor/golang.org/x/sys/unix",
 			"path": "golang.org/x/sys/unix",
-			"revision": "95cd2b9c79aa5e72ab0bc69b7ccc2be15bf850f6",
-			"revisionTime": "2017-11-18T12:42:23Z"
+			"revision": "8b4580aae2a0dd0c231a45d3ccb8434ff533b840",
+			"revisionTime": "2017-11-30T16:26:51Z"
 		},
 		{
 			"checksumSHA1": "riTVymIu2BFphV6UlA73Fn9tmmU=",
-			"origin": "github.com/sirupsen/logrus/vendor/golang.org/x/sys/windows",
 			"path": "golang.org/x/sys/windows",
-			"revision": "95cd2b9c79aa5e72ab0bc69b7ccc2be15bf850f6",
-			"revisionTime": "2017-11-18T12:42:23Z"
+			"revision": "8b4580aae2a0dd0c231a45d3ccb8434ff533b840",
+			"revisionTime": "2017-11-30T16:26:51Z"
 		}
 	],
 	"rootPath": "github.com/brainly/olowek"
