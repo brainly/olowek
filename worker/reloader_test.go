@@ -11,6 +11,7 @@ import (
 
 	"github.com/brainly/olowek/config"
 	"github.com/brainly/olowek/marathon"
+	"github.com/brainly/olowek/stats"
 )
 
 func TestNginxReloaderWorker(t *testing.T) {
@@ -40,8 +41,9 @@ func TestNginxReloaderWorker(t *testing.T) {
 			return nil
 		},
 	}
+	s := stats.NewStats()
 
-	reloader := NewNginxReloaderWorker(c, cfg)
+	reloader := NewNginxReloaderWorker(c, cfg, s)
 	reloader()
 
 	renderedTemplate, err := ioutil.ReadFile(tmpFile.Name())

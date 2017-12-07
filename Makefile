@@ -7,6 +7,9 @@ all: build
 build: build-deps
 	CGO_ENABLED=0 GOOS=linux govendor build $(LD_FLAGS) -o bin/olowek
 
+release: build
+	tar -C bin -czvf ./bin/olowek-v$(VERSION).tar.gz ./olowek
+
 test: deps
 	govendor test +l
 

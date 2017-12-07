@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	DefaultBindAddress   = ":8080"
 	DefaultNginxConfig   = "/etc/nginx/conf.d/services.conf"
 	DefaultNginxTemplate = "/etc/olowek/services.tpl"
 	DefaultNginxCmd      = "/usr/sbin/nginx"
@@ -18,6 +19,7 @@ const (
 
 type Config struct {
 	sync.RWMutex
+	BindAddress     string `json:"bind_address,omitempty"`
 	Scope           string `json:"scope,omitempty"`
 	Marathon        string `json:"marathon"`
 	NginxConfig     string `json:"nginx_config,omitempty"`
@@ -29,6 +31,7 @@ type Config struct {
 
 func NewConfigFromFile(path string) (*Config, error) {
 	config := Config{
+		BindAddress:   DefaultBindAddress,
 		Scope:         EmptyScope,
 		NginxConfig:   DefaultNginxConfig,
 		NginxTemplate: DefaultNginxTemplate,

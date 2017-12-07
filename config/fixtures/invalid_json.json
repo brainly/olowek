@@ -1,4 +1,3 @@
-{
   "scope": "internal",
   "bind_address": "127.0.0.1:8090",
   "marathon": "http://127.0.0.1:8080,127.0.0.1:8080",
