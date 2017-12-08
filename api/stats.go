@@ -7,6 +7,10 @@ import (
 	"github.com/brainly/olowek/stats"
 )
 
+const (
+	StatsEndpoint = "/v1/stats"
+)
+
 func StatsHandler(s stats.Stats) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

@@ -82,7 +82,7 @@ func main() {
 
 func setupHTTPServer(cfg *config.Config, s stats.Stats) {
 	r := mux.NewRouter()
-	r.HandleFunc("/v1/stats", api.StatsHandler(s))
+	r.HandleFunc(api.StatsEndpoint, api.StatsHandler(s))
 
 	err := http.ListenAndServe(cfg.BindAddress, r)
 	if err != nil {

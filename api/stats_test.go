@@ -9,7 +9,7 @@ import (
 )
 
 func TestStatsHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/v1/stats", nil)
+	req, err := http.NewRequest("GET", StatsEndpoint, nil)
 
 	if err != nil {
 		t.Fatalf("Unexpected error: %s", err)
