@@ -102,3 +102,26 @@ Get value of a key from `map[string]string` map (application labels and envs) or
 ```
 {{ $app.Env | keyOrDefault "SOMEKEY" "defaultValue" }}
 ```
+
+## API
+
+#### `GET /v1/stats`
+
+JSON response with nginx reloads, render failures etc. stats.
+
+Sample response:
+
+```json
+{
+  "reloads_failed": 0,
+  "reloads_ok": 5,
+  "renders_failed": 0,
+  "marathon_failed": 1,
+  "last_reload": "2017-12-08T12:32:45Z",
+  "last_reload_ago": 13,
+  "last_render": "2017-12-08T12:32:45Z",
+  "last_render_ago": 13,
+  "last_event": "2017-12-08T12:32:45Z",
+  "last_event_ago": 13
+}
+```
