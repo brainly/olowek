@@ -24,7 +24,7 @@ func RenderTemplate(src, dest string, data interface{}) error {
 	}
 
 	parentDir := filepath.Dir(dest)
-	tmpFile, err := ioutil.TempFile(parentDir, fmt.Sprint(".%s.tmp-", srcName))
+	tmpFile, err := ioutil.TempFile(parentDir, fmt.Sprintf(".%s.tmp-", srcName))
 	if err != nil {
 		return err
 	}

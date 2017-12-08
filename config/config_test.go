@@ -15,6 +15,7 @@ func TestNewConfigFromFile(t *testing.T) {
 			fixture:    "./fixtures/olowek.json",
 			shouldFail: false,
 			config: &Config{
+				BindAddress:   "127.0.0.1:8090",
 				Scope:         "internal",
 				Marathon:      "http://127.0.0.1:8080,127.0.0.1:8080",
 				NginxConfig:   "services.conf",
@@ -26,6 +27,7 @@ func TestNewConfigFromFile(t *testing.T) {
 			fixture:    "./fixtures/noscope.json",
 			shouldFail: false,
 			config: &Config{
+				BindAddress:   DefaultBindAddress,
 				Scope:         "",
 				Marathon:      "http://127.0.0.1:8080,127.0.0.1:8080",
 				NginxConfig:   "services.conf",
@@ -47,12 +49,18 @@ func TestNewConfigFromFile(t *testing.T) {
 			fixture:    "./fixtures/only_marathon.json",
 			shouldFail: false,
 			config: &Config{
+				BindAddress:   DefaultBindAddress,
 				Scope:         EmptyScope,
 				NginxConfig:   DefaultNginxConfig,
 				NginxTemplate: DefaultNginxTemplate,
 				NginxCmd:      DefaultNginxCmd,
 				Marathon:      "http://marathon:8080",
 			},
+		},
+		"Invalid JSON should and return config set to nil": {
+			fixture:    "./fixtures/invalid_json.json",
+			shouldFail: true,
+			config:     nil,
 		},
 	}
 	for name, tt := range configCases {

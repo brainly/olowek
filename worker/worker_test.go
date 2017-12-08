@@ -7,7 +7,7 @@ import (
 func TestWorkerWillCallAction(t *testing.T) {
 	testIterator := 0
 	action := func() {
-		testIterator += 1
+		testIterator++
 	}
 
 	w := Worker{

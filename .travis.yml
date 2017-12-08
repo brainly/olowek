@@ -3,7 +3,12 @@ language: go
 go:
   - 1.9
 
-script: make test
+env:
+  - VERSION=$TRAVIS_COMMIT
+
+script:
+  - make
+  - ./bin/olowek --version
 
 notifications:
   email: false

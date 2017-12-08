@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
+	"github.com/brainly/olowek/api"
 	"github.com/brainly/olowek/config"
 	"github.com/brainly/olowek/marathon"
+	"github.com/brainly/olowek/stats"
 	"github.com/brainly/olowek/utils"
 	"github.com/brainly/olowek/worker"
+	"github.com/gorilla/mux"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 )
@@ -51,6 +55,8 @@ func main() {
 	}
 	cfg.NginxReloadFunc = utils.NginxReload
 
+	s := stats.NewStats()
+
 	client, err := marathon.NewMarathonClient(cfg.Marathon)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -59,11 +65,30 @@ func main() {
 		}).Fatal("Error creating Marathon client")
 	}
 
+	go setupHTTPServer(cfg, s)
+	log.WithFields(log.Fields{
+		"addr": cfg.BindAddress,
+	}).Info("Started http server")
+
 	worker := worker.Worker{
 		Trigger: make(chan bool, 2),
-		Action:  worker.NewNginxReloaderWorker(client, cfg),
+		Action:  worker.NewNginxReloaderWorker(client, cfg, s),
 	}
 	worker.Work()
 
+	defer client.DisconnectFromEventStream()
 	client.ConnectToEventStream(worker.Trigger)
+}
+
+func setupHTTPServer(cfg *config.Config, s stats.Stats) {
+	r := mux.NewRouter()
+	r.HandleFunc("/v1/stats", api.StatsHandler(s))
+
+	err := http.ListenAndServe(cfg.BindAddress, r)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"addr": cfg.BindAddress,
+			"err":  err,
+		}).Fatal("Failed to start http server")
+	}
 }

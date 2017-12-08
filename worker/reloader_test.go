@@ -11,6 +11,7 @@ import (
 
 	"github.com/brainly/olowek/config"
 	"github.com/brainly/olowek/marathon"
+	"github.com/brainly/olowek/stats"
 )
 
 func TestNginxReloaderWorker(t *testing.T) {
@@ -36,12 +37,13 @@ func TestNginxReloaderWorker(t *testing.T) {
 		NginxTemplate: "./fixtures/services.tpl",
 		NginxCmd:      "/bin/true",
 		NginxReloadFunc: func(cmd string) error {
-			reloadFuncCalledTimes += 1
+			reloadFuncCalledTimes++
 			return nil
 		},
 	}
+	s := stats.NewStats()
 
-	reloader := NewNginxReloaderWorker(c, cfg)
+	reloader := NewNginxReloaderWorker(c, cfg, s)
 	reloader()
 
 	renderedTemplate, err := ioutil.ReadFile(tmpFile.Name())
@@ -71,9 +73,9 @@ func TestNginxReloaderWorker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error while getting stat for tmpfile: '%s'", err)
 	}
-	modtime_second_reload := stat.ModTime()
+	modtimeSecondReload := stat.ModTime()
 
-	if modtime != modtime_second_reload {
+	if modtime != modtimeSecondReload {
 		t.Fatalf("File should not be modified since no configuration changes were made")
 	}
 
