@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type statsJson struct {
+type statsJSON struct {
 	ReloadFailed   int `json:"reloads_failed"`
 	ReloadOk       int `json:"reloads_ok"`
 	RenderFailed   int `json:"renders_failed"`
@@ -42,7 +42,7 @@ func TestStatsMarshaling(t *testing.T) {
 		t.Fatalf("Unexpected error when marshaling to JSON: '%s'", err)
 	}
 
-	newData := statsJson{}
+	newData := statsJSON{}
 	err = json.Unmarshal(data, &newData)
 	if err != nil {
 		t.Fatalf("Unexpected error when unmarshaling from JSON: '%s'", err)

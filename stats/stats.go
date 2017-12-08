@@ -74,25 +74,25 @@ func (s *stats) MarshalJSON() ([]byte, error) {
 func (s *stats) ReloadFailed() {
 	s.Lock()
 	defer s.Unlock()
-	s.failedReloads += 1
+	s.failedReloads++
 }
 
 func (s *stats) RenderFailed() {
 	s.Lock()
 	defer s.Unlock()
-	s.failedRenders += 1
+	s.failedRenders++
 }
 
 func (s *stats) MarathonFailed() {
 	s.Lock()
 	defer s.Unlock()
-	s.failedMarathon += 1
+	s.failedMarathon++
 }
 
 func (s *stats) NginxReloaded() {
 	s.Lock()
 	defer s.Unlock()
-	s.nginxReloads += 1
+	s.nginxReloads++
 	s.lastReload = time.Now().UTC()
 }
 

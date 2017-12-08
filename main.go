@@ -65,7 +65,7 @@ func main() {
 		}).Fatal("Error creating Marathon client")
 	}
 
-	go setupHttpServer(cfg, s)
+	go setupHTTPServer(cfg, s)
 	log.WithFields(log.Fields{
 		"addr": cfg.BindAddress,
 	}).Info("Started http server")
@@ -79,7 +79,7 @@ func main() {
 	client.ConnectToEventStream(worker.Trigger)
 }
 
-func setupHttpServer(cfg *config.Config, s stats.Stats) {
+func setupHTTPServer(cfg *config.Config, s stats.Stats) {
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/stats", api.StatsHandler(s))
 

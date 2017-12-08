@@ -37,7 +37,7 @@ func TestNginxReloaderWorker(t *testing.T) {
 		NginxTemplate: "./fixtures/services.tpl",
 		NginxCmd:      "/bin/true",
 		NginxReloadFunc: func(cmd string) error {
-			reloadFuncCalledTimes += 1
+			reloadFuncCalledTimes++
 			return nil
 		},
 	}
@@ -73,9 +73,9 @@ func TestNginxReloaderWorker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error while getting stat for tmpfile: '%s'", err)
 	}
-	modtime_second_reload := stat.ModTime()
+	modtimeSecondReload := stat.ModTime()
 
-	if modtime != modtime_second_reload {
+	if modtime != modtimeSecondReload {
 		t.Fatalf("File should not be modified since no configuration changes were made")
 	}
 
