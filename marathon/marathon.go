@@ -25,10 +25,12 @@ type Task struct {
 type Marathon interface {
 	GetApplications(filterScope string) ([]Application, error)
 	ConnectToEventStream(callback chan bool)
+	DisconnectFromEventStream()
 }
 
 type client struct {
-	client api.Marathon
+	client        api.Marathon
+	eventLoopDone bool
 }
 
 func NewMarathonClient(marathonURL string) (Marathon, error) {
@@ -42,7 +44,8 @@ func NewMarathonClient(marathonURL string) (Marathon, error) {
 	}
 
 	return &client{
-		client: c,
+		client:        c,
+		eventLoopDone: false,
 	}, nil
 }
 
@@ -93,6 +96,9 @@ func (c *client) ConnectToEventStream(callback chan bool) {
 	callback <- true
 
 	for {
+		if c.eventLoopDone {
+			break
+		}
 
 		select {
 		case event := <-events:
@@ -109,6 +115,10 @@ func (c *client) ConnectToEventStream(callback chan bool) {
 
 	// Unsubscribe from Marathon events
 	c.client.RemoveEventsListener(events)
+}
+
+func (c *client) DisconnectFromEventStream() {
+	c.eventLoopDone = true
 }
 
 func (c *client) getAppTasks(app api.Application) []Task {

@@ -76,6 +76,7 @@ func main() {
 	}
 	worker.Work()
 
+	defer client.DisconnectFromEventStream()
 	client.ConnectToEventStream(worker.Trigger)
 }
 
